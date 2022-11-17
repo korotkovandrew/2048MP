@@ -30,6 +30,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._currentUser = ''
 
+        #TODO определить в каком виде хранится статья для удобной работы с ней
         self._openedArticle = ''  # ?
         self._currentArticleText = ARTICLE_TEXT_PLACEHOLDER
         self._currentArticleTitle = ARTICLE_TITLE_PLACEHOLDER
@@ -48,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return self._currentUser != ''
 
     def updateRecommendations(self):
-        #TODO обновление рекомендаций за счёт поля класса
+        self._client.sendRequest('get recommended articles', ())
         pass
     
     def updateGui(self):
@@ -70,10 +71,10 @@ class MainWindow(QtWidgets.QMainWindow):
             print(f'Like {(self._currentUser)} -> {response}')
 
     def randomArticleButtonPressed(self):
-        if self.isLoggedIn():
-            pass
-        else:
-            pass
+        response = self._client.sendRequest('get random article', (self._currentUser))
+        
+    def recommendedArticleButtonPressed(self, article):
+        response = self._client.sendRequest('get random article', (self._currentUser))
 
     def logInButtonPressed(self):
         logInDialog = LogInDialog()
@@ -93,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if signInDialog.exec():
             nickname = signInDialog.nickname.text()
             password = signInDialog.password.text()
-            passwordRepeat = signInDialog.passwordRepeat.text()
-            response = self._client.sendRequest('sign in', (nickname, password, passwordRepeat))
+            response = self._client.sendRequest('sign in', (nickname, password))
+                
             #TODO реакция на ответ сервера по запросу регистрации аккаунта
-            print(f'Sign in {(nickname, password, passwordRepeat)} -> {response}')
+            print(f'Sign in {(nickname, password)} -> {response}')

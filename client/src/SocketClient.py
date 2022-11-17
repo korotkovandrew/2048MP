@@ -5,6 +5,13 @@ TIMEOUT = 1
 # DATA_CLOSING_SEQ = '\r\n\r\n'
 DATA_CLOSING_SEQ = '\0'
 
+#TODO реализовать поддержку всех запросов
+# Поддерживаемые запросы:
+# 'like' (username, article)
+# 'log in' (username, password)
+# 'sign in' (username, password)
+# 'get random article' (-)
+# 'get recommended articles' (username)
 
 class SocketClient:
     def __init__(self, host, port):
@@ -30,18 +37,18 @@ class SocketClient:
     def isConnected(self) -> bool:
         return self._connected
     
-    def formRequest(self, requestType: str, requestInfo: tuple) -> bytes:
+    def formRequest(self, requestType: str, requestArgs: tuple) -> bytes:
         requestString = requestType + '\n'
-        requestString += '\n'.join(map(str, requestInfo))
+        requestString += '\n'.join(map(str, requestArgs))
         requestString += DATA_CLOSING_SEQ
         return requestString.encode(ENCODING)
     
-    def sendRequest(self, requestType: str, requestInfo: tuple) -> str:
+    def sendRequest(self, requestType: str, requestArgs: tuple) -> str:
         if not self.isConnected():
-            print(f'Request {requestType} {requestInfo} attempt without connection')
+            print(f'Request {requestType} {requestArgs} attempt without connection')
             return ''
         
-        req = self.formRequest(requestType, requestInfo)
+        req = self.formRequest(requestType, requestArgs)
         
         try:
             self._socket.send(req)
@@ -50,7 +57,7 @@ class SocketClient:
             response = dataBytes.decode(ENCODING)
             
         except Exception as e:
-            print(f'Error while sending a {requestType} request with parameters {requestInfo} to {self._host}:{self._port}')
+            print(f'Error while sending a {requestType} request with parameters {requestArgs} to {self._host}:{self._port}')
             print(f'Exception: {e}')
             return ''
             

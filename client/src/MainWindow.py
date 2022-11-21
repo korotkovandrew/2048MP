@@ -3,15 +3,12 @@ import sys
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import QUrl
 
-from LogInDialog import LogInDialog
-from SignInDialog import SignInDialog
-from SocketClient import SocketClient
+from src.LogInDialog import LogInDialog
+from src.SignInDialog import SignInDialog
+from src.SocketClient import SocketClient
 
-HOST = 'localhost'
-PORT = 2020
+HOST, PORT = 'localhost', 2020
 
-ARTICLE_TITLE_PLACEHOLDER = 'No Article Opened'
-ARTICLE_TEXT_PLACEHOLDER = '...'
 FULL_ARTICLE_LINK_PLACEHOLDER = 'https://google.com'
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -32,8 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #TODO определить в каком виде хранится статья для удобной работы с ней
         self._openedArticle = ''  # ?
-        self._currentArticleText = ARTICLE_TEXT_PLACEHOLDER
-        self._currentArticleTitle = ARTICLE_TITLE_PLACEHOLDER
+        self._currentArticleText = self.articleText.toPlainText()
         self._currentArticleLink = FULL_ARTICLE_LINK_PLACEHOLDER
         
         self.updateGui()
@@ -53,7 +49,6 @@ class MainWindow(QtWidgets.QMainWindow):
         pass
     
     def updateGui(self):
-        self.articleTitle.setText(self._currentArticleTitle)
         self.articleText.setText(self._currentArticleText)
         
         self.fullArticleLinkLabel.linkActivated.connect(lambda: QtGui.QDesktopServices.openUrl(QUrl(self._currentArticleLink)))
@@ -64,17 +59,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def likeButtonPressed(self):
         if not self.isLoggedIn():
             print("Attempt to like without registration")
-            self.signInButtonPressed()
+            self.logInButtonPressed()
         else:
             response = self._client.sendRequest('like', (self._currentUser, self._openedArticle))
             #TODO реакция на ответ сервера по запросу лайка
             print(f'Like {(self._currentUser)} -> {response}')
 
     def randomArticleButtonPressed(self):
-        response = self._client.sendRequest('get random article', (self._currentUser))
+        response = self._client.sendRequest('get random article', ())
         
     def recommendedArticleButtonPressed(self, article):
-        response = self._client.sendRequest('get random article', (self._currentUser))
+        response = self._client.sendRequest('get recommended articles', (self._currentUser))
 
     def logInButtonPressed(self):
         logInDialog = LogInDialog()

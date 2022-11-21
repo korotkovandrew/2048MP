@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication
 
-from regexpPatterns import *
+from src.regexpPatterns import *
 import re
 
 class SignInDialog(QDialog):

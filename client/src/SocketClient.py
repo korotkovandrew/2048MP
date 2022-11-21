@@ -2,16 +2,27 @@ import socket
 
 ENCODING = 'utf-8'
 TIMEOUT = 1
-# DATA_CLOSING_SEQ = '\r\n\r\n'
-DATA_CLOSING_SEQ = '\0'
 
 #TODO реализовать поддержку всех запросов
 # Поддерживаемые запросы:
-# 'like' (username, article)
-# 'log in' (username, password)
-# 'sign in' (username, password)
-# 'get random article' (-)
-# 'get recommended articles' (username)
+# 'LIKE' (username, article)
+# 'LOGIN' (username, password)
+# 'REGISTER' (username, password)
+# 'GET' (-)
+
+#TODO вынести в папку API
+# message class for storing requests and responses
+class Message:
+    def __init__(self, dataBytes: bytes):
+        data = dataBytes.decode(ENCODING).split('\n')
+        self.type, *self.args = data[0], data[1:]
+    
+    def fromString(string: str):
+        data = string.split('\n')
+        return Message((data[0] + '\n' + '\n'.join(data[1:]) + '\n').encode(ENCODING))
+        
+    def tobytes(self):
+        return (self.type + '\n' + '\n'.join(map(str, self.args)) + '\n').encode(ENCODING)
 
 class SocketClient:
     def __init__(self, host, port):
@@ -40,7 +51,6 @@ class SocketClient:
     def formRequest(self, requestType: str, requestArgs: tuple) -> bytes:
         requestString = requestType + '\n'
         requestString += '\n'.join(map(str, requestArgs))
-        requestString += DATA_CLOSING_SEQ
         return requestString.encode(ENCODING)
     
     def sendRequest(self, requestType: str, requestArgs: tuple) -> str:

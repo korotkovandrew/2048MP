@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1112</width>
-    <height>788</height>
+    <height>786</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,6 +47,7 @@ color: #BDC1C6;</string>
     <string notr="true">QPushButton {
 	background-color: #303134;
 	border-radius: 10px;
+	min-height: 34px;
 }
 QPushButton:hover {
 	background-color: #1E1F20;
@@ -76,36 +77,7 @@ QPushButton:onclick {
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
-        <item>
-         <widget class="QLabel" name="articleTitle">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font: 87 30pt &quot;Roboto Black&quot;;
-padding-top: 20px</string>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="text">
-           <string>Article Title</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::PlainText</enum>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
         <item>
          <widget class="QTextBrowser" name="articleText">
           <property name="sizePolicy">
@@ -140,7 +112,7 @@ border-radius: 20px</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Network-Based Secret Communication in Clouds: A Survey&lt;br /&gt;From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;&lt;br /&gt;It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. &lt;br /&gt;&lt;br /&gt;From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;&lt;br /&gt;It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. &lt;br /&gt;From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;&lt;br /&gt;It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\ From: kumar@iopb.ernet.in&lt;br /&gt;Date: Tue Jan 7 07:55:11 1992 (7kb)&lt;br /&gt;Title: An Algorithm to Generate Classical Solutions for String Effective Action Authors: S. Kar, S. Khastgir and A. Kumar Comments: 12 pages Journal-ref: Mod.Phys.Lett. A7 (1992) 1545-1552 &lt;br /&gt;\\ It is shown explicitly, that a number of solutions for the background field equations of the string effective action in space-time dimension D can be generated from any known lower dimensional solution, when background fields have only time dependence. An application of the result to the two dimensional charged black hole is presented. The case of background with more general coordinate dependence is also discussed. \\&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="acceptRichText">
            <bool>false</bool>
@@ -187,7 +159,7 @@ padding-left: 10px;</string>
             <property name="minimumSize">
              <size>
               <width>180</width>
-              <height>0</height>
+              <height>34</height>
              </size>
             </property>
             <property name="text">
@@ -272,6 +244,9 @@ padding-left: 10px;</string>
         </item>
         <item row="3" column="0" colspan="2">
          <widget class="QLabel" name="recommendationsLabel">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>

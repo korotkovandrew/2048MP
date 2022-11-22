@@ -5,25 +5,39 @@ import socketserver
 ENCODING = 'utf-8'
 SUPPORTED_COMMANDS = ['PING', 'LIKE', 'LOGIN', 'REGISTER', 'GET']
 
+
 class Message:
-    def __init__(self, dataBytes: bytes):
-        data = dataBytes.decode(ENCODING).split('\n')
-        self.type, *self.args = data[0], data[1:]
-    
+    def __init__(self, messageType: str, *args: any):
+        self.type = messageType
+        self.args = args
+
+    @staticmethod
     def fromString(string: str):
         data = string.split('\n')
-        return Message((data[0] + '\n' + '\n'.join(data[1:]) + '\n').encode(ENCODING))
+        return Message(data[0], data[:1])
         
-    def tobytes(self):
+    @staticmethod
+    def fromBytes(dataBytes: bytes):
+        return Message.fromString(dataBytes.decode(ENCODING))
+    
+    def toBytes(self):
         return (self.type + '\n' + '\n'.join(map(str, self.args)) + '\n').encode(ENCODING)
-
+    
+    def __str__(self) -> str:
+        return self.type + '\n' + '\n'.join(map(str, self.args))
+    
+    
 class RequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
+        print(f'Connection from {self.client_address[0]}:{self.client_address[1]}')
         dataBytes = self.request.recv(1024)
-        request = Message(dataBytes)
-                
-        response = self.handleRequest(request)
-        self.request.sendall(response.tobytes())
+        print(type(dataBytes))
+        while dataBytes:
+            message = Message.fromBytes(dataBytes)
+            response = self.handleRequest(message)
+            print(f'Request: {message}')
+            self.request.sendall(response.toBytes())
+            dataBytes = self.request.recv(1024)
 
     def handleRequest(self, message: Message) -> Message:
         if message.type not in SUPPORTED_COMMANDS:

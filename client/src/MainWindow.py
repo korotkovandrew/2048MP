@@ -24,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
             sys.exit()
 
         # TODO окно регистрации
-
+        
         self._currentUser = ''
 
         #TODO определить в каком виде хранится статья для удобной работы с ней
@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return self._currentUser != ''
 
     def updateRecommendations(self):
-        self._client.sendRequest('get recommended articles', ())
+        self._client.sendRequest('GET', ())
         pass
     
     def updateGui(self):
@@ -61,35 +61,41 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Attempt to like without registration")
             self.logInButtonPressed()
         else:
-            response = self._client.sendRequest('like', (self._currentUser, self._openedArticle))
+            response = self._client.sendRequest('LIKE', (self._currentUser, self._openedArticle))
             #TODO реакция на ответ сервера по запросу лайка
             print(f'Like {(self._currentUser)} -> {response}')
 
     def randomArticleButtonPressed(self):
-        response = self._client.sendRequest('get random article', ())
+        response = self._client.sendRequest('GET', ())
+        print(f'Random article -> {response}')
         
     def recommendedArticleButtonPressed(self, article):
-        response = self._client.sendRequest('get recommended articles', (self._currentUser))
-
+        response = self._client.sendRequest('GET', (self._currentUser))
+        print(f'Recommended article -> {response}')
+        
     def logInButtonPressed(self):
         logInDialog = LogInDialog()
         logInDialog.registerButton.clicked.connect(logInDialog.close)
         logInDialog.registerButton.clicked.connect(self.signInButtonPressed)
 
-        if logInDialog.exec():
-            nickname = logInDialog.nickname.text()
-            password = logInDialog.password.text()
-            response = self._client.sendRequest('log in', (nickname, password))
-            #TODO реакция на ответ сервера по запросу входа в аккаунт
-            print(f'Log in {(nickname, password)} -> {response}')
+        if not logInDialog.exec():
+            return
+        
+        nickname = logInDialog.nickname.text()
+        password = logInDialog.password.text()
+        response = self._client.sendRequest('LOGIN', (nickname, password))
+        #TODO реакция на ответ сервера по запросу входа в аккаунт
+        print(f'Log in {(nickname, password)} -> {response}')
 
     def signInButtonPressed(self):
         signInDialog = SignInDialog()
 
-        if signInDialog.exec():
-            nickname = signInDialog.nickname.text()
-            password = signInDialog.password.text()
-            response = self._client.sendRequest('sign in', (nickname, password))
-                
-            #TODO реакция на ответ сервера по запросу регистрации аккаунта
-            print(f'Sign in {(nickname, password)} -> {response}')
+        if not signInDialog.exec():
+            return
+        
+        nickname = signInDialog.nickname.text()
+        password = signInDialog.password.text()
+        response = self._client.sendRequest('REGISTER', (nickname, password))
+            
+        #TODO реакция на ответ сервера по запросу регистрации аккаунта
+        print(f'Sign in {(nickname, password)} -> {response}')

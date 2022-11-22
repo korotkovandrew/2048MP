@@ -13,16 +13,24 @@ TIMEOUT = 1
 #TODO вынести в папку API
 # message class for storing requests and responses
 class Message:
-    def __init__(self, dataBytes: bytes):
-        data = dataBytes.decode(ENCODING).split('\n')
-        self.type, *self.args = data[0], data[1:]
-    
+    def __init__(self, messageType: str, *args: any):
+        self.type = messageType
+        self.args = args
+
+    @staticmethod
     def fromString(string: str):
         data = string.split('\n')
-        return Message((data[0] + '\n' + '\n'.join(data[1:]) + '\n').encode(ENCODING))
+        return Message(data[0], data[:1])
         
-    def tobytes(self):
+    @staticmethod
+    def fromBytes(dataBytes: bytes):
+        return Message.fromString(dataBytes.decode(ENCODING))
+    
+    def toBytes(self):
         return (self.type + '\n' + '\n'.join(map(str, self.args)) + '\n').encode(ENCODING)
+    
+    def __str__(self) -> str:
+        return self.type + '\n' + '\n'.join(map(str, self.args))
 
 class SocketClient:
     def __init__(self, host, port):
@@ -46,29 +54,20 @@ class SocketClient:
         print(f'Connection closed ({self._host}:{self._port})')
         
     def isConnected(self) -> bool:
-        return self._connected
+        return self._connected and self._socket is not None
     
-    def formRequest(self, requestType: str, requestArgs: tuple) -> bytes:
-        requestString = requestType + '\n'
-        requestString += '\n'.join(map(str, requestArgs))
-        return requestString.encode(ENCODING)
-    
-    def sendRequest(self, requestType: str, requestArgs: tuple) -> str:
+    def sendRequest(self, requestType: str, requestArgs: tuple) -> Message:
         if not self.isConnected():
             print(f'Request {requestType} {requestArgs} attempt without connection')
-            return ''
-        
-        req = self.formRequest(requestType, requestArgs)
-        
+            response = Message('ERROR', 'Connection failed')
         try:
-            self._socket.send(req)
-            dataBytes = self._socket.recv(1024)
+            message = Message(requestType, requestArgs)
+            self._socket.send(message.toBytes())
+            response = Message.fromBytes(self._socket.recv(1024))
             #TODO поддержка отправки большего количества пакетов
-            response = dataBytes.decode(ENCODING)
-            
         except Exception as e:
             print(f'Error while sending a {requestType} request with parameters {requestArgs} to {self._host}:{self._port}')
             print(f'Exception: {e}')
-            return ''
+            response = Message('ERROR', f'Error while sending a {requestType} request')
             
         return response

@@ -1,101 +1,98 @@
-import sys
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import uic
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QDialog
 
-from PyQt5 import QtWidgets, uic, QtGui
-from PyQt5.QtCore import QUrl
+from src.ClientSocket.Sender import Sender
+from src.Requests import *
 
-from src.LogInDialog import LogInDialog
-from src.SignInDialog import SignInDialog
-from src.SocketClient import SocketClient
-
-HOST, PORT = 'localhost', 2020
-
-FULL_ARTICLE_LINK_PLACEHOLDER = 'https://google.com'
-
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        uic.loadUi('./src/ui/mainWindow.ui', self)
-        self.setWindowIcon(QtGui.QIcon('./img/AB_icon.ico'))
-
-        self._client = SocketClient(HOST, PORT)
-        if not self._client.isConnected():
-            # TODO gui уведомление об ошибке подключения
-            print("Connection error. Application was closed")
-            sys.exit()
-
-        # TODO окно регистрации
+class MainWindow(Sender, QMainWindow):
+    def __init__(self, 
+                 serverIP: str, 
+                 serverPort: int, 
+                 currentUser: str):
         
-        self._currentUser = ''
+        Sender.__init__(self, serverIP, serverPort)
+        QMainWindow.__init__(self)
 
-        #TODO определить в каком виде хранится статья для удобной работы с ней
-        self._openedArticle = ''  # ?
-        self._currentArticleText = self.articleText.toPlainText()
-        self._currentArticleLink = FULL_ARTICLE_LINK_PLACEHOLDER
+        self.initUI(currentUser)
+        self.initSignals()
         
-        self.updateGui()
+        response = self.send(GET(currentUser, True))
+        if response['code'] != '':
+            self.alert(True, response['code'])
+            self.close()
+        elif response['liked']:
+            self.showLiked()
         
-        self.logInButton.clicked.connect(self.logInButtonPressed)
-        self.signInButton.clicked.connect(self.signInButtonPressed)
-        self.likeButton.clicked.connect(self.likeButtonPressed)
-        self.randomArticleButton.clicked.connect(self.randomArticleButtonPressed)
+        self.currentArticleID: int = response['articleID']
+        self.articleTitleLabel.setText(response['articleData']['title'])
+        self.articleText.setText(response['articleData']['content'])
 
-        self.show()
-        
-    def isLoggedIn(self):
-        return self._currentUser != ''
+    def initAlertWindow(self):
+        self.alertWindow = QDialog()
+        uic.loadUi('src/ui/Alert.ui', self.alertWindow)
+        self.alertWindow.message.setText('...')
 
-    def updateRecommendations(self):
-        self._client.sendRequest('GET', ())
-        pass
-    
-    def updateGui(self):
-        self.articleText.setText(self._currentArticleText)
+    def initUI(self, username: str):
+        self.initAlertWindow()
         
-        self.fullArticleLinkLabel.linkActivated.connect(lambda: QtGui.QDesktopServices.openUrl(QUrl(self._currentArticleLink)))
-        self.fullArticleLinkLabel.setText(f'<a style="color: inherit; text-decoration: inherit;" href="{self._currentArticleLink}">Open Full Article</a>')
+        uic.loadUi('src/ui/MainWindow.ui', self)
+        self.setWindowTitle('Article Browser')
+        self.setWindowIcon(QIcon('./src/ui/ico/Ab_icon.ico'))
         
-        self.updateRecommendations()
-
-    def likeButtonPressed(self):
-        if not self.isLoggedIn():
-            print("Attempt to like without registration")
-            self.logInButtonPressed()
-        else:
-            response = self._client.sendRequest('LIKE', (self._currentUser, self._openedArticle))
-            #TODO реакция на ответ сервера по запросу лайка
-            print(f'Like {(self._currentUser)} -> {response}')
-
-    def randomArticleButtonPressed(self):
-        response = self._client.sendRequest('GET', ())
-        print(f'Random article -> {response}')
+        self.articleTitleLabel.setText('NO ARTICLE OPENED')
+        self.articleText.setText('')
+        self.nicknameLabel.setText(username)
+        self.likeButton.setText('♥')
         
-    def recommendedArticleButtonPressed(self, article):
-        response = self._client.sendRequest('GET', (self._currentUser))
-        print(f'Recommended article -> {response}')
-        
-    def logInButtonPressed(self):
-        logInDialog = LogInDialog()
-        logInDialog.registerButton.clicked.connect(logInDialog.close)
-        logInDialog.registerButton.clicked.connect(self.signInButtonPressed)
-
-        if not logInDialog.exec():
-            return
-        
-        nickname = logInDialog.nickname.text()
-        password = logInDialog.password.text()
-        response = self._client.sendRequest('LOGIN', (nickname, password))
-        #TODO реакция на ответ сервера по запросу входа в аккаунт
-        print(f'Log in {(nickname, password)} -> {response}')
-
-    def signInButtonPressed(self):
-        signInDialog = SignInDialog()
-
-        if not signInDialog.exec():
-            return
-        
-        nickname = signInDialog.nickname.text()
-        password = signInDialog.password.text()
-        response = self._client.sendRequest('REGISTER', (nickname, password))
             
-        #TODO реакция на ответ сервера по запросу регистрации аккаунта
-        print(f'Sign in {(nickname, password)} -> {response}')
+    def initSignals(self):
+        self.randomArticleButton.clicked.connect(self.randomArticleSignal)
+        self.likeButton.clicked.connect(self.likeSignal)
+    
+    def showLiked(self, liked: bool = True):
+        if liked:
+            self.likeButton.setEnabled(False)
+            self.likeButton.setStyleSheet('background-color: #E74C3C;')
+        else:
+            self.likeButton.setEnabled(True)
+            self.likeButton.setStyleSheet('background-color: #303134;')
+
+    def randomArticleSignal(self):
+        if self.nicknameLabel.text() == '':
+            self.alert(True, 'You are not logged in')
+            return
+        response = self.send(GET(self.nicknameLabel.text(), True))
+        if response['code']:
+            self.alert(True, response['code'])
+            return
+        
+        self.currentArticleID = response['articleID']
+        self.articleTitleLabel.setText(response['articleData']['title'])
+        self.articleText.setText(response['articleData']['content'])
+        self.showLiked(response['liked'])
+        
+    def likeSignal(self):
+        if self.nicknameLabel.text() == '':
+            self.alert(True, 'You are not logged in')
+            return
+        if self.currentArticleID == 0:
+            self.alert(True, 'You have not opened any article')
+            return
+        
+        response = self.send(LIKE(self.nicknameLabel.text(), 
+                                  self.currentArticleID))
+        if response['code'] == '':
+            self.showLiked(True)
+
+    def alert(self, critical: bool, message: str):
+        self.setEnabled(False)
+        self.alertWindow.message.setText(message)
+        if critical:
+            self.alertWindow.setWindowIcon(QIcon('src/ui/ico/critical.ico'))
+        else:
+            self.alertWindow.setWindowIcon(QIcon('src/ui/ico/info.ico'))
+        self.alertWindow.exec_()
+        self.setEnabled(True)
+            

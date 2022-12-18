@@ -1,29 +1,47 @@
-from PyQt5 import QtWidgets, uic, QtGui
-from PyQt5.QtWidgets import QDialog, QApplication
+from PyQt5 import QtWidgets, uic, QtGui, QtCore
+from PyQt5.QtWidgets import QDialog
 
-from src.regexpPatterns import *
-import re
+from src.Requests import LOGIN
+from src.ClientSocket.Sender import Sender
+from src.RegisterDialog import RegisterDialog
 
-class LogInDialog(QDialog):
-    def __init__(self):
-        super(LogInDialog, self).__init__()
-        uic.loadUi('./src/ui/loginDialog.ui', self)
-        self.setWindowIcon(QtGui.QIcon('./img/AB_icon.ico'))
+class LoginDialog(Sender, QDialog):
+    def __init__(self, serverIP: str, serverPort: int):
+        Sender.__init__(self, serverIP, serverPort)
+        QDialog.__init__(self)
         
-        self.registerButton.clicked.connect(self.reject) 
+        uic.loadUi('./src/ui/LoginDialog.ui', self)
+        self.setWindowIcon(QtGui.QIcon('./src/ui/ico/AB_icon.ico'))
         
+        self.serverIP = serverIP
+        self.serverPort = serverPort
+        
+        passwordValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$"))
+        usernameValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$"))
+        
+        self.nickname.setValidator(usernameValidator)
+        
+        self.password.setValidator(passwordValidator)
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.acceptButton.clicked.connect(self.initialInputValidation)
         
-        self.show()
-
-    #TODO сделать alert'ы с ошибкой
-    def initialInputValidation(self):
-        if not re.fullmatch(NICKNAME_RE_PATTERN, self.nickname.text()):
-            self.reject()
-            print(NICKNAME_VALIDATION_ERROR_MESSAGE)
-        elif not re.fullmatch(PASSWORD_RE_PATTERN, self.password.text()):
-            self.reject()
-            print(PASSWORD_VALIDATION_ERROR_MESSAGE)
-        else:
+        
+        self.acceptButton.clicked.connect(self.login)
+        self.registerButton.clicked.connect(self.register) 
+        
+    def register(self):
+        registerDialog = RegisterDialog(self.serverIP, self.serverPort)
+        self.hide()
+        if (registerDialog.exec_()):
+            self.nickname.setText(registerDialog.nickname.text())
             self.accept()
+        else:
+            self.errorMessage.setText('Registration canceled')
+        
+    def login(self):
+        response = self.send(LOGIN(self.nickname.text(), 
+                                   self.password.text()))
+        
+        if not response['code']:
+            self.accept()
+        else:
+            self.errorMessage.setText(response['code'])

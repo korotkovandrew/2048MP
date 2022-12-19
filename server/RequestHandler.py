@@ -4,40 +4,12 @@ from socketserver import BaseRequestHandler
 from PasswordValid import *
 
 import pickle
-import random
 
-# TODO add same config file for client and server
-ENCODING = "utf-8"
 RECV_SIZE = 1024*10
+ENCODING = "utf-8"
 
-# TODO add database of users and articles
-
-with open('database.json', 'r', encoding=ENCODING) as f:
-    database = json.load(f)
-    database['articles'] = {
-        int(articleID): article for articleID, article in database['articles'].items()}
-
-
-def clearUsersLikes():
-    for user in database['users'].values():
-        user['likes'] = []
-    for article in database['articles'].values():
-        article['likes'] = 0
-
-clearUsersLikes()
-
-def printDatabase():
-    print('Database:')
-    for username, user in database['users'].items():
-        print(f'User {username}:')
-        print(f'\tPassword: {user["password"]}')
-        print(f'\tLikes: {user["likes"]}')
-    for articleID, article in database['articles'].items():
-        print(f'Article {articleID}:')
-        print(f'\tTitle: {article["title"]}')
-        print(f'\tLikes: {article["likes"]}')
-
-printDatabase()
+from DBConnector import DBConnector
+dbConnector = DBConnector('localhost', 12345)
 
 OK                   = {'code': ''}
 USER_NOT_FOUND       = {'code': 'User not found'}
@@ -49,7 +21,7 @@ ALREADY_LIKED        = {'code': 'Already liked'}
 NOT_IMPLEMENTED      = {'code': 'Not implemented'}
 
 class RequestHandler(BaseRequestHandler):
-
+    
     def handle(self):
         print('Got connection from', self.client_address)
         while True:
@@ -75,49 +47,47 @@ class RequestHandler(BaseRequestHandler):
                     print(f'Unknown request type: {request["type"]}')
 
             self.request.send(pickle.dumps(response))
-            self.updateDB()
             
         print(f'Client {self.client_address} disconnected')
-
-    def updateDB(self):
-        with open('database.json', 'w') as f:
-            json.dump(database, f)
-
+    
+    
     def handleLike(self, request: dict) -> dict:
         username: str = request['data']['username']
         articleID: int = request['data']['articleID']
 
-        if username not in database['users']:
+        if not dbConnector.getUser(username):
             return USER_NOT_FOUND
-        if articleID not in database['articles']:
+        if not dbConnector.getArticle(articleID):
             return ARTICLE_NOT_FOUND
-        if articleID in database['users'][username]['likes']:
+        if articleID in dbConnector.getUserLikes(username):
             return ALREADY_LIKED
 
-        database['users'][username]['likes'].append(articleID)
-        database['articles'][articleID]['likes'] += 1
-
+        dbConnector.setLiked(username, articleID)
         print(f'User {username} liked article {articleID}')
-
+        
+        #TODO update recommendations for other users
+        #TODO return recommended articles for user (if any)
+        
         return OK
+
 
     def handleLogin(self, request: dict) -> dict:
         username: str = request['data']['username']
 
-        if username not in database['users']:
+        if not dbConnector.getUser(username):
             return USER_NOT_FOUND
-        if request['data']['password'] != database['users'][username]['password']:
+        if request['data']['password'] != dbConnector.getUser(username)['password']:
             return WRONG_PASSWORD
 
         print(f'User {username} logged in')
-
         return OK
+
 
     def handleRegister(self, request: dict) -> dict:
         username: str = request['data']['username']
         password: str = request['data']['password']
 
-        if username in database['users']:
+        if dbConnector.getUser(username):
             return USER_ALREADY_EXISTS
 
         passwordError: str = checkPassword(password)
@@ -128,40 +98,38 @@ class RequestHandler(BaseRequestHandler):
         if passwordError:
             return {"code": passwordError}
 
-        database['users'].update({username: {"password": password,"likes": []}})
+        dbConnector.addUser(username, password)
 
         print(f'User {username} registered')
-        
         return OK
+
 
     def handleGet(self, request: dict) -> dict:
         isRandom: bool = request['data']['isRandom']
 
         if isRandom:
-            articleID: int = random.choice(list(database['articles'].keys()))
+            articleID, articleData = dbConnector.getRandomArticle()
+            isLiked = dbConnector.isLiked(request['data']['username'], articleID)
+            
             print(f'User {request["data"]["username"]} got random article {articleID}')
-            return {"code": '',
-                    "articleData": database['articles'][articleID],
-                    "articleID": articleID,
-                    "liked": articleID in database['users'][request['data']['username']]['likes']}
+            return {"code": '', "articleData": articleData, "articleID": articleID, "liked": isLiked }
 
         elif request['data']['articleID']:
-            if request['data']['articleID'] not in database['articles']:
+            if not dbConnector.getArticle(request['data']['articleID']):
                 return {"code": 'Article not found'}
-
+            
+            articleID, articleData = dbConnector.getArticle(request['data']['articleID'])
+            isLiked = dbConnector.isLiked(request['data']['username'], articleID)
+            
             print(f'User {request["data"]["username"]} got article {request["data"]["articleID"]}')
-
-            return {"code": '',
-                    "articleID": request['data']['articleID'],
-                    "articleData": database['articles'][request['data']['articleID']],
-                    "liked": articleID in database['users'][request['data']['username']]['likes']}
+            return {"code": '', "articleID": articleID, "articleData": articleData, "liked": isLiked }
         else:
-            return NOT_IMPLEMENTED
-
-            # TODO ADD 'СППР'
-            username: str = request['data']['username']
-
-            if username not in database['users']:
+            if not dbConnector.getArticle(request['data']['articleID']):
+                return {"code": 'Article not found'}
+            if not dbConnector.getUser(request['data']['username']):
                 return {"code": 'User not found'}
-
-            # print(f'User {username} logged in')
+            
+            articleID, articleData = dbConnector.getRecommendedArticles(request['data']['username'])
+            isLiked = dbConnector.isLiked(request['data']['username'], articleID)
+            
+            return {"code": '', "articleID": articleID, "articleData": articleData, "liked": isLiked }

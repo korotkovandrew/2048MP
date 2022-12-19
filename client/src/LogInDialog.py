@@ -27,7 +27,8 @@ class LoginDialog(Sender, QDialog):
         
         self.acceptButton.clicked.connect(self.login)
         self.registerButton.clicked.connect(self.register) 
-        
+
+
     def register(self):
         registerDialog = RegisterDialog(self.serverIP, self.serverPort)
         self.hide()
@@ -36,6 +37,7 @@ class LoginDialog(Sender, QDialog):
             self.accept()
         else:
             self.errorMessage.setText('Registration canceled')
+
         
     def login(self):
         response = self.send(LOGIN(self.nickname.text(), 

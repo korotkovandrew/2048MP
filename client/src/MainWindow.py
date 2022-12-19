@@ -29,10 +29,12 @@ class MainWindow(Sender, QMainWindow):
         self.articleTitleLabel.setText(response['articleData']['title'])
         self.articleText.setText(response['articleData']['content'])
 
+
     def initAlertWindow(self):
         self.alertWindow = QDialog()
         uic.loadUi('src/ui/Alert.ui', self.alertWindow)
         self.alertWindow.message.setText('...')
+
 
     def initUI(self, username: str):
         self.initAlertWindow()
@@ -45,9 +47,11 @@ class MainWindow(Sender, QMainWindow):
         self.articleText.setText('')
         self.nicknameLabel.setText(username)
             
+            
     def initSignals(self):
         self.randomArticleButton.clicked.connect(self.randomArticleSignal)
         self.likeButton.clicked.connect(self.likeSignal)
+    
     
     def showLiked(self, liked: bool = True):
         if liked:
@@ -56,6 +60,7 @@ class MainWindow(Sender, QMainWindow):
         else:
             self.likeButton.setEnabled(True)
             self.likeButton.setStyleSheet('QPushButton {background-color: #303134; border-radius: 10px; min-height: 34px; } QPushButton:hover { background-color: #1E1F20; }')
+
 
     def randomArticleSignal(self):
         if self.nicknameLabel.text() == '':
@@ -67,9 +72,12 @@ class MainWindow(Sender, QMainWindow):
             return
         
         self.currentArticleID = response['articleID']
+        
         self.articleTitleLabel.setText(response['articleData']['title'])
         self.articleText.setText(response['articleData']['content'])
+        
         self.showLiked(response['liked'])
+     
         
     def likeSignal(self):
         if self.nicknameLabel.text() == '':
@@ -83,6 +91,7 @@ class MainWindow(Sender, QMainWindow):
                                   self.currentArticleID))
         if response['code'] == '':
             self.showLiked(True)
+
 
     def alert(self, critical: bool, message: str):
         self.setEnabled(False)

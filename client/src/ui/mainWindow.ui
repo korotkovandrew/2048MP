@@ -279,7 +279,7 @@ p, li { white-space: pre-wrap; }
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>20</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -340,11 +340,17 @@ p, li { white-space: pre-wrap; }
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="nicknameLabel">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">color: #315ae3;</string>
           </property>
           <property name="text">
-           <string/>
+           <string>placeholder</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

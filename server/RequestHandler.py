@@ -1,6 +1,5 @@
 from socketserver import BaseRequestHandler
 
-from Responses import *
 from PasswordValid import *
 
 import pickle

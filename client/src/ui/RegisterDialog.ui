@@ -215,6 +215,12 @@ color: #BDC1C6;</string>
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>nickname</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>passwordRepeat</tabstop>
+  <tabstop>acceptButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

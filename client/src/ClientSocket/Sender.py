@@ -10,8 +10,10 @@ class Sender:
             with ClientSocket(self.server_ip, self.server_port) as sock:
                 sock.send(json)
                 return sock.recv()
-        except Exception as e:
-            #TODO: реализовать поддержку кириллицы в кодах ошибок
+        except ConnectionRefusedError as e:
             print(e)
-            return {'code': str(e, encoding='utf-8')}
+            return {'code': 'Connection failed'}
+        except Exception as e:
+            print(e)
+            return {'code': str(e)}
             

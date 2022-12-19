@@ -18,4 +18,11 @@ if __name__ == '__main__':
                             SERVER_PORT, 
                             loginWindow.nickname.text())
         window.show()
-        sys.exit(app.exec_())
+        try:
+            sys.exit(app.exec_())
+        except KeyboardInterrupt:
+            print('Exiting')
+            sys.exit(0)
+        except Exception as e:
+            print(e)
+            sys.exit(1)

@@ -195,6 +195,12 @@ text-align: left;
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>nickname</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>acceptButton</tabstop>
+  <tabstop>registerButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -44,8 +44,6 @@ class MainWindow(Sender, QMainWindow):
         self.articleTitleLabel.setText('NO ARTICLE OPENED')
         self.articleText.setText('')
         self.nicknameLabel.setText(username)
-        self.likeButton.setText('♥')
-        
             
     def initSignals(self):
         self.randomArticleButton.clicked.connect(self.randomArticleSignal)
@@ -57,7 +55,7 @@ class MainWindow(Sender, QMainWindow):
             self.likeButton.setStyleSheet('background-color: #E74C3C;')
         else:
             self.likeButton.setEnabled(True)
-            self.likeButton.setStyleSheet('background-color: #303134;')
+            self.likeButton.setStyleSheet('QPushButton {background-color: #303134; border-radius: 10px; min-height: 34px; } QPushButton:hover { background-color: #1E1F20; }')
 
     def randomArticleSignal(self):
         if self.nicknameLabel.text() == '':

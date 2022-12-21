@@ -77,7 +77,6 @@ class RequestHandler(BaseRequestHandler):
             articleID, articleData = dbConnector.getRandomArticle()
             articles[articleID] = articleData
         
-        print(f'Recommended articles for {username}: {articles}')
         return {"code": "", "data": articles }
 
 

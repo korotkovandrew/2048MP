@@ -16,7 +16,8 @@ if __name__ == '__main__':
         print(f'Logged in as {loginWindow.nickname.text()}')
         window = MainWindow(SERVER_IP, 
                             SERVER_PORT, 
-                            loginWindow.nickname.text())
+                            loginWindow.username,
+                            loginWindow.userID)
         window.show()
         try:
             sys.exit(app.exec_())

@@ -16,14 +16,13 @@ class LoginDialog(Sender, QDialog):
         self.serverIP = serverIP
         self.serverPort = serverPort
         
-        passwordValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$"))
-        usernameValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$"))
+        passwordValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r'^[a-zA-Z0-9]{4,}$'))
+        usernameValidator = QtGui.QRegExpValidator(QtCore.QRegExp(r'^[a-zA-Z0-9]{4,}$'))
         
         self.nickname.setValidator(usernameValidator)
         
         self.password.setValidator(passwordValidator)
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
-        
         
         self.acceptButton.clicked.connect(self.login)
         self.registerButton.clicked.connect(self.register) 
@@ -33,7 +32,8 @@ class LoginDialog(Sender, QDialog):
         registerDialog = RegisterDialog(self.serverIP, self.serverPort)
         self.hide()
         if (registerDialog.exec_()):
-            self.nickname.setText(registerDialog.nickname.text())
+            self.username = registerDialog.nickname.text()
+            self.userID = registerDialog.userID
             self.accept()
         else:
             self.errorMessage.setText('Registration canceled')
@@ -44,6 +44,8 @@ class LoginDialog(Sender, QDialog):
                                    self.password.text()))
         
         if not response['code']:
+            self.username = self.nickname.text()
+            self.userID = response['userID']
             self.accept()
         else:
             self.errorMessage.setText(response['code'])

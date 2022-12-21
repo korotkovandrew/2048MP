@@ -13,13 +13,17 @@ from src.RecommendationArea import RecommendationArea
 class MainWindow(Sender, QMainWindow):
     def __init__(self, 
                  serverIP: str, 
-                 serverPort: int, 
-                 currentUser: str):
+                 serverPort: int,
+                 username: str,
+                 userID: int):
         
         Sender.__init__(self, serverIP, serverPort)
         QMainWindow.__init__(self)
+                
+        self.userID = userID
+        self.username = username
         
-        self.initUI(currentUser)
+        self.initUI()
         self.initSignals()
         self.loadArticle()
         
@@ -30,7 +34,7 @@ class MainWindow(Sender, QMainWindow):
         self.alertWindow.message.setText('...')
 
 
-    def initUI(self, username: str):
+    def initUI(self):
         self.initAlertWindow()
         
         uic.loadUi('src/ui/MainWindow.ui', self)
@@ -40,7 +44,7 @@ class MainWindow(Sender, QMainWindow):
         self.articleTitleLabel.setWordWrap(True)
         self.articleTitleLabel.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         
-        self.nicknameLabel.setText(username)
+        self.nicknameLabel.setText(self.username)
         
             
     def initSignals(self):
@@ -51,41 +55,38 @@ class MainWindow(Sender, QMainWindow):
     def showLiked(self, liked: bool = True):
         self.likeButton.setEnabled(not liked)
         if liked:
-            self.likeButton.setStyleSheet("background-color: #E74C3C;")
+            self.likeButton.setStyleSheet('background-color: #E74C3C;')
         else:
             self.likeButton.setStyleSheet('QPushButton { background-color: #303134; border-radius: 10px; min-height: 34px; } QPushButton:hover { background-color: #1E1F20; } QPushButton:onclick { background-color: #1A1B1C;}')
 
+
     def loadArticle(self, articleID: int = 0):
-        if self.nicknameLabel.text() == '':
-            self.alert(True, 'You are not logged in')
-            return
-        response = self.send(GET(self.nicknameLabel.text(), articleID))
+        response = self.send(GET(self.userID, articleID))
         if response['code']:
             self.alert(True, response['code'])
-            return
+            self.alertWindow.exec_()
+            raise Exception('Server error')
         
-        self.currentArticleID = response['articleID']
-        self.articleTitleLabel.setText(response['articleData']['title'])
-        self.articleText.setText(response['articleData']['content'])
+        self.openedArticleID = response['articleID']
+        self.articleTitleLabel.setText(response['title'])
+        #TODO add article author
+        self.articleText.setText(response['content'])
         self.showLiked(response['liked'])
      
         
     def likeSignal(self):
-        if self.nicknameLabel.text() == '':
-            self.alert(True, 'You are not logged in')
-            return
-        if self.currentArticleID == 0:
-            self.alert(True, 'You have not opened any article')
-            return
-        
-        response = self.send(LIKE(self.nicknameLabel.text(), 
-                                  self.currentArticleID))
+        response = self.send(LIKE(self.userID, self.openedArticleID))
         if response['code'] == '':
             self.showLiked(True)
-    
+        else:
+            self.alert(True, response['code'])
+            self.alertWindow.exec_()
+            raise Exception('Server error')
+
+        
         articles = []
-        for articleID in response['data']:
-            articles.append((articleID, response['data'][articleID]['title']))
+        for article in response['articles']:
+            articles.append((article['id'], article['title']))
         
         self.updateRecomendations(articles)
 

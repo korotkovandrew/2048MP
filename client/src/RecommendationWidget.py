@@ -19,7 +19,7 @@ class RecommendationWidget(QWidget):
         self.setLayout(self.layout)
         
         self.label = QLabel(self.articleTitle)
-        self.label.setStyleSheet('color: #315ae3; background-color: #303134; border-radius: 2px; padding: 10px;')
+        self.label.setStyleSheet('background-color: #303134; border-radius: 5px; padding: 10px;')
         self.label.setWordWrap(True)
         self.label.setMaximumWidth(260) 
         self.label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -27,5 +27,6 @@ class RecommendationWidget(QWidget):
         self.layout.addWidget(self.label)
         
         self.button = QPushButton('Open')
+        self.button.setStyleSheet('color: #315ae3;')
         
         self.layout.addWidget(self.button)

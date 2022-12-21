@@ -16,8 +16,8 @@ class RegisterDialog(Sender, QDialog):
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.passwordRepeat.setEchoMode(QtWidgets.QLineEdit.Password)
 
-        passwordRegexp: QtCore.QRegExp = QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$")
-        usernameRegexp: QtCore.QRegExp = QtCore.QRegExp(r"^[a-zA-Z0-9]{4,}$")
+        passwordRegexp: QtCore.QRegExp = QtCore.QRegExp(r'^[a-zA-Z0-9]{4,}$')
+        usernameRegexp: QtCore.QRegExp = QtCore.QRegExp(r'^[a-zA-Z0-9]{4,}$')
         
         usernameValidator = QtGui.QRegExpValidator(usernameRegexp)
         passwordValidator = QtGui.QRegExpValidator(passwordRegexp)
@@ -41,6 +41,8 @@ class RegisterDialog(Sender, QDialog):
                                           self.password.text()))
         
         if not response['code']:
+            self.username = self.nickname.text()
+            self.userID = response['userID']
             self.accept()
         else:
             self.errorMessage.setText(response['code'])

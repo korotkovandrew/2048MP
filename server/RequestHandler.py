@@ -1,7 +1,7 @@
 import json
 from socketserver import BaseRequestHandler
 
-from PasswordValid import *
+import Validation
 
 import pickle
 
@@ -67,8 +67,18 @@ class RequestHandler(BaseRequestHandler):
         
         #TODO update recommendations for other users
         #TODO return recommended articles for user (if any)
+        n = 5
         
-        return OK
+        dbConnector.getRecommendedArticleIDs(username, n)
+        #! remove this
+        # get n random articles and return them
+        articles = {}
+        for _ in range(n):
+            articleID, articleData = dbConnector.getRandomArticle()
+            articles[articleID] = articleData
+        
+        print(f'Recommended articles for {username}: {articles}')
+        return {"code": "", "data": articles }
 
 
     def handleLogin(self, request: dict) -> dict:
@@ -90,8 +100,8 @@ class RequestHandler(BaseRequestHandler):
         if dbConnector.getUser(username):
             return USER_ALREADY_EXISTS
 
-        passwordError: str = checkPassword(password)
-        nicknameError: str = checkNickname(username)
+        passwordError: str = Validation.checkPassword(password)
+        nicknameError: str = Validation.checkNickname(username)
 
         if nicknameError:
             return {"code": nicknameError}
@@ -105,16 +115,15 @@ class RequestHandler(BaseRequestHandler):
 
 
     def handleGet(self, request: dict) -> dict:
-        isRandom: bool = request['data']['isRandom']
-
+        isRandom: bool = (request['data']['articleID'] == 0)
+        
         if isRandom:
             articleID, articleData = dbConnector.getRandomArticle()
             isLiked = dbConnector.isLiked(request['data']['username'], articleID)
             
             print(f'User {request["data"]["username"]} got random article {articleID}')
             return {"code": '', "articleData": articleData, "articleID": articleID, "liked": isLiked }
-
-        elif request['data']['articleID']:
+        else:
             if not dbConnector.getArticle(request['data']['articleID']):
                 return {"code": 'Article not found'}
             
@@ -122,14 +131,4 @@ class RequestHandler(BaseRequestHandler):
             isLiked = dbConnector.isLiked(request['data']['username'], articleID)
             
             print(f'User {request["data"]["username"]} got article {request["data"]["articleID"]}')
-            return {"code": '', "articleID": articleID, "articleData": articleData, "liked": isLiked }
-        else:
-            if not dbConnector.getArticle(request['data']['articleID']):
-                return {"code": 'Article not found'}
-            if not dbConnector.getUser(request['data']['username']):
-                return {"code": 'User not found'}
-            
-            articleID, articleData = dbConnector.getRecommendedArticles(request['data']['username'])
-            isLiked = dbConnector.isLiked(request['data']['username'], articleID)
-            
             return {"code": '', "articleID": articleID, "articleData": articleData, "liked": isLiked }

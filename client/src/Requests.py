@@ -25,10 +25,8 @@ def LIKE(username: str,
 
 
 def GET(username: str,
-        isRandom: bool, 
         articleID: int = 0) -> dict:
 
     return {"type": "get",
             "data": {"username": username,
-                     "isRandom": isRandom,
                      "articleID": articleID}}

@@ -5,14 +5,12 @@ def checkPassword(password) -> str:
         Returns empty string if password is valid
         or error message if password is invalid
     '''
-    if len(password) < 6:
+    if len(password) < 4:
         return "Password is too short"
     elif not re.search("[a-z]", password):
         return "Password must contain at least one lowercase letter"
     elif not re.search("[A-Z]", password):
         return "Password must contain at least one uppercase letter"
-    elif not re.search("[0-9]", password):
-        return "Password must contain at least one number"
     elif re.search("\s", password):
         return "Password must contain no whitespaces"
     else:

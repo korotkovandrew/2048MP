@@ -2,63 +2,61 @@
 import json
 import random
 
-# TODO add database of users and articles
-ENCODING = "utf-8"
+import DSS
+
+# TODO add MySQL or something
 
 class DBConnector:
-    def __init__(self, databaseIP, databasePort):
+    def __init__(self, databaseIP: str, databasePort: int):
         self.databaseIP = databaseIP
         self.databasePort = databasePort
         self.database = None
-        with open('database.json', 'r', encoding=ENCODING) as f:
+        with open('database.json', 'r', encoding="utf-8") as f:
             self.database = json.load(f)
-            self.database['articles'] = {
-                int(articleID): article for articleID, article in self.database['articles'].items()}
 
+    def updateDatabase(self):
+        with open('database.json', 'w', encoding="utf-8") as f:
+            json.dump(self.database, f)
 
-    def __del__(self):
-        with open('database.json', 'w', encoding=ENCODING) as f:
-            json.dump(self.database, f, indent=4)
-        
-        
-    def getUser(self, username) -> dict:
-        print(username)
+    def getUser(self, username: str) -> dict:
         return self.database['users'][username] if username in self.database['users'] else None
-    
-    
-    def removeUser(self, username) -> None:
+
+    def removeUser(self, username: str) -> None:
         self.database['users'].pop(username)
-        
-        
-    def getUserLikes(self, username) -> list:
+        self.updateDatabase()
+
+    def getUserLikes(self, username: str) -> list:
         return self.database['users'][username]['likes'] if username in self.database['users'] else None
-        
-        
-    def isLiked(self, username, articleID) -> bool:
+
+    def isLiked(self, username: str, articleID: int) -> bool:
         return articleID in self.database['users'][username]['likes']
-        
-        
-    def setLiked(self, username, articleID) -> None:
+
+    def setLiked(self, username: str, articleID: int) -> None:
+        stringArticleID = str(articleID)
         self.database['users'][username]['likes'].append(articleID)
-        self.database['articles'][articleID]['likes'] += 1
-        
-        
-    def addUser(self, username, password):
+        self.database['articles'][stringArticleID]['likes'] += 1
+        self.updateDatabase()
+
+    def addUser(self, username: str, password: str):
         self.database['users'].update({username: {"password": password,
                                                   "likes": []}})
-        
-        
-    def getArticle(self, articleID) -> dict:
-        return self.database['articles'][articleID] if articleID in self.database['articles'] else None
-    
-    
+        self.updateDatabase()
+
+    def getArticle(self, articleID: int) -> dict:
+        stringArticleID = str(articleID)
+        return (articleID, 
+                self.database['articles'][stringArticleID]) if stringArticleID in self.database['articles'] else None
+
     def getRandomArticle(self) -> dict:
-        articleID = random.choice(list(self.database['articles'].keys()))
-        article = self.database['articles'][articleID]
-        return articleID, article
-        
-        
-    def getRecommendedArticleID(self, username) -> int:
-        # get from user recomendations list (as fast as possible)
+        stringArticleID: str = random.choice(list(self.database['articles'].keys()))
+        article: dict = self.database['articles'][stringArticleID]
+        return int(stringArticleID), article
+
+    def getRecommendedArticleIDs(self, username: str, numberOfArticles: int) -> list:
+        #! now it just returns random articles
         # TODO СППР
-        pass
+        articles = []
+        for _ in range(numberOfArticles):
+            articleID, _ = self.getRandomArticle()
+            articles.append(articleID)
+        

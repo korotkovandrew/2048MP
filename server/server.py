@@ -2,7 +2,7 @@ import socketserver
 from RequestHandler import RequestHandler
 
 #TODO add same config file for client and server
-LISTEN_IP = 'localhost'
+LISTEN_IP = ''
 LISTEN_PORT = 3000
 
 if __name__ == '__main__':

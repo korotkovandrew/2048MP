@@ -35,7 +35,6 @@ def getWeightMatrix(clearedTexts: np.array) -> np.ndarray:
     length = len(clearedTexts)
     weightMatrix = np.zeros((length, length), dtype=int)
     
-    
     for i in range(length):
         for j in range(i, length):
             if (i == j):
@@ -47,7 +46,7 @@ def getWeightMatrix(clearedTexts: np.array) -> np.ndarray:
     return weightMatrix
 
 def loadMatrix(path):
-    return np.loadtxt(path, dtype=int)
+    return np.loadtxt(path, delimiter=',', dtype=int)
 
 def main(DBPath, articlesCount):
     conn = sqlite3.connect(DBPath)
@@ -57,15 +56,14 @@ def main(DBPath, articlesCount):
     c.execute("SELECT id, content FROM articles")
     data = c.fetchall()
     
-    
-    # make numpy array from content of articles
     dataFrame = pd.DataFrame(data, columns=['id', 'content'])
     data = dataFrame['content'].values
     
-    
-    data = data[:articlesCount]
+    if articlesCount:
+        data = data[:articlesCount]
     data = [clearFromTrash(i) for i in data]
     data = np.array([lemmatizeText(wt(i)) for i in data], dtype=object)
+    
     
     weightMatrix = getWeightMatrix(data)
     
@@ -81,7 +79,7 @@ if __name__ == '__main__':
         if sys.argv[3].isdigit():
             articlesCount = int(sys.argv[3])
         elif sys.argv[3] == "all":
-            articlesCount = -1
+            articlesCount = None
     else:
         articlesCount = 100
         

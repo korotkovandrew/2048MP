@@ -57,14 +57,16 @@ class SQLiteConnector:
         conn.close()
 
 
-    def getUserLikes(self, username: str) -> list:
+    def getUserLikes(self, userID: int) -> list:
         conn = self.__createConnection()
         cursor = conn.cursor()
         
-        cursor.execute('SELECT id_likes FROM users WHERE username = ?', (username,))
+        cursor.execute('SELECT id_likes FROM users WHERE id = ?', (userID,))
         row = cursor.fetchone()
         
+        print(row[0])
         likes = list(map(int , row[0].split(LIKE_SPLITTER))) if row and row[0] else []
+        print(likes)
         
         conn.close()
         return likes
@@ -154,18 +156,16 @@ class SQLiteConnector:
                     articles.append({'id':article['id'], 'title':article['title']})
             return articles
     
-        
         articleIDs = []
-        for i in range(len(userLikes)):
-            if i >= numberOfArticles:
+        for j in range(len(userLikes)):
+            if j >= numberOfArticles:
                 break
-            weights = WEIGHT_MATRIX[userLikes]
-            # get top weights and their indices in pairs (i, w) in WEIGHT_MATRIX if indices are not already in userLikes
+            weights = WEIGHT_MATRIX[userLikes[j]]
             topWeights = [(i, w) for i, w in enumerate(weights, 1) if i not in userLikes and i not in articleIDs]
             topWeights = sorted(topWeights, key=lambda x: x[1], reverse=True)[:numberOfArticles]
 
             articleIDs += topWeights
-            
+        
         # get top numberOfArticles articles from globalBest
         articleIDs = sorted(articleIDs, key=lambda x: x[1], reverse=True)[:numberOfArticles]    
         

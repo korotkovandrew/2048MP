@@ -1,6 +1,3 @@
-# QtWidget for main window to display label and button to return id of article to open to main window
-# class stores id of article and its title
-
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 from PyQt5.QtCore import Qt
 

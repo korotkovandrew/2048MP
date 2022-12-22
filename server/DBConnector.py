@@ -3,16 +3,18 @@ from sqlite3 import Error
 
 LIKE_SPLITTER = ';'
 
-import DSS
+from DSS.DSS import loadMatrix
 
 DB_PATH = 'database/db.sqlite3'
+DSS_PATH = 'DSS/DSS.txt'
+
+WEIGHT_MATRIX = loadMatrix(DSS_PATH)
 
 class SQLiteConnector:
     def __createConnection(self):
         try:
             return sqlite3.connect(DB_PATH)
         except sqlite3.Error as e:
-            # print(e)
             print('Failed to connect to database')
             exit(1)
 
@@ -141,12 +143,35 @@ class SQLiteConnector:
                                          'content': row[5]}
 
     def getRecommendedArticles(self, userID: int, numberOfArticles: int) -> list:
-        #! now it just returns random articles
-        # TODO СППР
         articles = []
-        for _ in range(numberOfArticles):
-            article = self.getRandomArticle()
+        
+        userLikes: list = self.getUserLikes(userID)
+        
+        if not userLikes:
+            for _ in range(numberOfArticles):
+                article = self.getRandomArticle()
+                if article:
+                    articles.append({'id':article['id'], 'title':article['title']})
+            return articles
+    
+        
+        articleIDs = []
+        for i in range(len(userLikes)):
+            if i >= numberOfArticles:
+                break
+            weights = WEIGHT_MATRIX[userLikes]
+            # get top weights and their indices in pairs (i, w) in WEIGHT_MATRIX if indices are not already in userLikes
+            topWeights = [(i, w) for i, w in enumerate(weights, 1) if i not in userLikes and i not in articleIDs]
+            topWeights = sorted(topWeights, key=lambda x: x[1], reverse=True)[:numberOfArticles]
+
+            articleIDs += topWeights
+            
+        # get top numberOfArticles articles from globalBest
+        articleIDs = sorted(articleIDs, key=lambda x: x[1], reverse=True)[:numberOfArticles]    
+        
+        for articleID, _ in articleIDs:
+            article = self.getArticle(articleID)
             if article:
                 articles.append({'id':article['id'], 'title':article['title']})
-
+        
         return articles

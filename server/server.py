@@ -6,6 +6,7 @@ LISTEN_IP = 'localhost'
 LISTEN_PORT = 3000
 
 if __name__ == '__main__':
+    print('Server starting...') 
     serv = socketserver.TCPServer((LISTEN_IP, LISTEN_PORT), RequestHandler)
     print('Server started on port', LISTEN_PORT)
     try:

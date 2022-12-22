@@ -19,7 +19,9 @@ UNKNOWN_REQUEST_TYPE = {'code': 'Unknown request type'}
 ALREADY_LIKED        = {'code': 'Already liked'}
 NOT_IMPLEMENTED      = {'code': 'Not implemented'}
 
+print('Connecting to database...')
 dbConnector = SQLiteConnector()
+print('Connected to database')
 
 class RequestHandler(BaseRequestHandler):
     def handle(self):

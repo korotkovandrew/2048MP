@@ -1,5 +1,3 @@
-# scrollable widget with vertical layout
-
 from PyQt5.QtWidgets import QScrollArea, QFrame, QWidget, QVBoxLayout
 from PyQt5.QtCore import Qt
 

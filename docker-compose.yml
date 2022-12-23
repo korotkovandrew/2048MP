@@ -14,7 +14,7 @@ services:
   client:
     build: client/
 
-    command: python ./client.py
+    command: python ./client.pyw
 
     network_mode: host
 
